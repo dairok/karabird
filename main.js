@@ -1,31 +1,31 @@
-navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-if (navigator.getUserMedia) {
-    navigator.getUserMedia({
-            audio: true
-        },
-        function(stream) {
-            var audioContext = new AudioContext();
-            window.analyser = audioContext.createAnalyser();
-            var microphone = audioContext.createMediaStreamSource(stream);
-            window.javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+// navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+// if (navigator.getUserMedia) {
+//     navigator.getUserMedia({
+//             audio: true
+//         },
+//         function(stream) {
+//             var audioContext = new AudioContext();
+//             window.analyser = audioContext.createAnalyser();
+//             var microphone = audioContext.createMediaStreamSource(stream);
+//             window.javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
 
-            window.analyser.smoothingTimeConstant = 0.8;
-            window.analyser.fftSize = 1024;
+//             window.analyser.smoothingTimeConstant = 0.8;
+//             window.analyser.fftSize = 1024;
 
-            microphone.connect(window.analyser);
-            window.analyser.connect(javascriptNode);
-            window.javascriptNode.connect(audioContext.destination);
+//             microphone.connect(window.analyser);
+//             window.analyser.connect(javascriptNode);
+//             window.javascriptNode.connect(audioContext.destination);
 
-            // canvasContext = $("#canvas")[0].getContext("2d");
+//             // canvasContext = $("#canvas")[0].getContext("2d");
 
 
-        },
-        function(err) {
-            console.log("The following error occured: " + err.name)
-        });
-} else {
-    console.log("getUserMedia not supported");
-}
+//         },
+//         function(err) {
+//             console.log("The following error occured: " + err.name)
+//         });
+// } else {
+//     console.log("getUserMedia not supported");
+// }
 
 
 var mainState = {
@@ -50,7 +50,7 @@ var mainState = {
 
         // Display the bird at the position x=100 and y=245
         this.bird = game.add.sprite(100, 245, 'bird');
-        this.HOLE_SIZE = 3;
+        this.HOLE_SIZE = 5;
 
         // Add physics to the bird
         // Needed for: movements, gravity, collisions, etc.
@@ -64,21 +64,21 @@ var mainState = {
         var spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         spaceKey.onDown.add(this.jump, this);
 
-        window.javascriptNode.onaudioprocess = () => {
-            var array = new Uint8Array(window.analyser.frequencyBinCount);
-            window.analyser.getByteFrequencyData(array);
-            var values = 0;
+        // window.javascriptNode.onaudioprocess = () => {
+        //     var array = new Uint8Array(window.analyser.frequencyBinCount);
+        //     window.analyser.getByteFrequencyData(array);
+        //     var values = 0;
 
-            var length = array.length;
-            for (var i = 0; i < length; i++) {
-                values += (array[i]);
-            }
+        //     var length = array.length;
+        //     for (var i = 0; i < length; i++) {
+        //         values += (array[i]);
+        //     }
 
-            var average = values / length;
+        //     var average = values / length;
 
-            console.log(Math.round(average));
-            if (average > 5 ) this.jump(average*10)
-        }
+        //     console.log(Math.round(average));
+        //     if (average > 5 ) this.jump(average*10)
+        // }
 
         this.pipes = game.add.group();
 
@@ -97,7 +97,7 @@ var mainState = {
     },
 
     jump: function(value) {
-        this.bird.body.velocity.y = -value;
+        this.bird.body.velocity.y = -450;
         var animation = game.add.tween(this.bird);
         animation.to({angle: -20}, 100);
         animation.start();
@@ -164,11 +164,11 @@ var mainState = {
 };
 
 var game = new Phaser.Game(800, 490);
-setTimeout( ()=> {
+// setTimeout( ()=> {
 
     game.state.add('main', mainState);
 
     game.state.start('main');
 
-}, 2000)
+// }, 2000)
 
