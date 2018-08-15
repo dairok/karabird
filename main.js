@@ -34,6 +34,7 @@ const ROWS_FREQUENCY = 2500;
 const ROWS_SPEED = 200;
 const WINDOW_LENGTH = 800;
 const WINDOW_HEIGHT = 490;
+let VALUE_GAIN = 1;
 
 var mainState = {
     preload: function() {
@@ -87,7 +88,7 @@ var mainState = {
     },
 
     jump: function(value) {
-        this.bird.body.velocity.y = -450;
+        this.bird.body.velocity.y = -450 * VALUE_GAIN;
         var animation = game.add.tween(this.bird);
         animation.to({angle: -20}, 100);
         animation.start();
@@ -113,7 +114,7 @@ var mainState = {
         for (var i = 0; i < 8; i++) {
             if (i < hole || i >= hole + this.HOLE_SIZE) this.addOnePipe(400, i * 60 + 10);
         }
-        this.score -= 1;
+        this.score--;
 
         this.labelScore.text = this.score;
          if (this.score < 0) {
@@ -128,16 +129,14 @@ var mainState = {
     hitPipe: function() {
         // If the bird has already hit a pipe, do nothing
         // It means the bird is already falling off the screen
-        if (this.bird.alive == false) return false;
+        if (!this.bird.alive) return false;
         this.bird.alive = false;
         game.time.events.remove(this.timer);
-
-        // Go through all the pipes, and stop their movement
         this.pipes.forEach(p => p.body.velocity.x = 0, this);
     }
 };
 
-var game = new Phaser.Game(WINDOW_LENGTH, WINDOW_HEIGHT);
+var game = new Phaser.Game(WINDOW_LENGTH, WINDOW_HEIGHT, Phaser.AUTO, 'game-area');
 // setTimeout( ()=> {
 
     game.state.add('main', mainState);
@@ -146,3 +145,8 @@ var game = new Phaser.Game(WINDOW_LENGTH, WINDOW_HEIGHT);
 
 // }, 2000)
 
+$('#volume-gain').val(VALUE_GAIN);
+$('#volume-gain').on('change', el => {
+    VALUE_GAIN = this.val();
+    debugger;
+}) ;
