@@ -29,9 +29,11 @@ const ROWS_FREQUENCY = 2500;
 const ROWS_SPEED = 200;
 const WINDOW_LENGTH = 800;
 const WINDOW_HEIGHT = 490;
-let FREQUENCY_LIMIT = 7;
+const KEY_VALUE = 1;
+let FREQUENCY_LIMIT = 5;
 let frequency_counter = 0;
-let VALUE_GAIN = 450;
+let VALUE_GAIN = 70;
+
 
 var mainState = {
     preload: function () {
@@ -60,21 +62,22 @@ var mainState = {
         var spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         spaceKey.onDown.add(this.jump, this);
         //mic_event
-        // window.javascriptNode.onaudioprocess = () => {
-        //     let array = new Uint8Array(window.analyser.frequencyBinCount);
-        //     window.analyser.getByteFrequencyData(array);
-        //     var values = 0;
-        //     var length = array.length;
-        //     for (var i = 0; i < length; i++) {
-        //         values += (array[i]);
-        //     }
-        //     var average = values / length;
-        //     console.log(Math.round(average));
-        //     if (average > 5 && frequency_counter++ > FREQUENCY_LIMIT) {
-        //         this.jump(average * 10);
-        //         frequency_counter = 0;
-        //     }
-        // };
+        window.javascriptNode.onaudioprocess = () => {
+            let array = new Uint8Array(window.analyser.frequencyBinCount);
+            window.analyser.getByteFrequencyData(array);
+            var values = 0;
+            var length = array.length;
+            for (var i = 0; i < length; i++) {
+                values += (array[i]);
+            }
+            var average = values / length;
+
+            if (average > 5 && frequency_counter++ > FREQUENCY_LIMIT) {
+                this.jump({value: Math.round(average / 70)});
+                console.log(Math.round(average));
+                frequency_counter = 0;
+            }
+        };
 
         this.pipes = game.add.group();
         this.timer = game.time.events.loop(ROWS_FREQUENCY, this.addRowOfPipes, this);
@@ -87,8 +90,9 @@ var mainState = {
         if (this.bird.angle < 20) this.bird.angle += 1;
     },
 
-    jump: function (value = 1) {
-        this.bird.body.velocity.y = - VALUE_GAIN * value;
+    jump: function (options) {
+        if (!options.value) options.value = KEY_VALUE;
+        this.bird.body.velocity.y = -VALUE_GAIN * options.value;
         var animation = game.add.tween(this.bird);
         animation.to({angle: -20}, 100);
         animation.start();
@@ -137,9 +141,9 @@ var mainState = {
 };
 
 var game = new Phaser.Game(WINDOW_LENGTH, WINDOW_HEIGHT, Phaser.AUTO, 'game-area');
-setTimeout( ()=> {
-game.state.add('main', mainState);
-game.state.start('main');
+setTimeout(()=> {
+    game.state.add('main', mainState);
+    game.state.start('main');
 }, 2000);
 
 $('#volume-gain').val(VALUE_GAIN);
