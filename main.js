@@ -22,9 +22,7 @@ if (navigator.getUserMedia) {
     alert("Sound not supported");
 }
 
-const BEGIN_SCORE = 2;
 const HOLE_SIZE = 5;
-const GRAVITY_VALUE = 1000;
 const ROWS_FREQUENCY = 2500;
 const ROWS_SPEED = 200;
 const WINDOW_LENGTH = 800;
@@ -32,7 +30,19 @@ const WINDOW_HEIGHT = 490;
 const KEY_VALUE = 1;
 let FREQUENCY_LIMIT = 5;
 let frequency_counter = 0;
+let BEGIN_SCORE = 3;
 let VALUE_GAIN = 70;
+let GRAVITY_VALUE = 1000;
+
+// set form values
+
+const volume_gain_el = $('#VALUE_GAIN');
+const gravity_gain_el = $('#GRAVITY_VALUE');
+const begin_score_el = $('#BEGIN_SCORE');
+
+volume_gain_el.val(VALUE_GAIN);
+gravity_gain_el.val(GRAVITY_VALUE);
+begin_score_el.val(BEGIN_SCORE);
 
 
 var mainState = {
@@ -72,7 +82,7 @@ var mainState = {
             }
             var average = values / length;
 
-            if (average > 5 && frequency_counter++ > FREQUENCY_LIMIT) {
+            if (average > 45 && frequency_counter++ > FREQUENCY_LIMIT) {
                 this.jump({value: Math.round(average / 70)});
                 console.log(Math.round(average));
                 frequency_counter = 0;
@@ -85,7 +95,9 @@ var mainState = {
     },
 
     update: function () {
-        if (this.bird.y < 0 || this.bird.y > 490) this.restartGame();
+        if (this.bird.y < 0) this.bird.y = 50;
+        if (this.bird.y > 470) this.bird.body.velocity.y = -VALUE_GAIN * 4;
+        // if (this.bird.y < 0 || this.bird.y > 490) this.restartGame();
         game.physics.arcade.overlap(this.bird, this.pipes, this.hitPipe, null, this);
         if (this.bird.angle < 20) this.bird.angle += 1;
     },
@@ -108,7 +120,6 @@ var mainState = {
         this.pipes.add(pipe);
         game.physics.arcade.enable(pipe);
         pipe.body.velocity.x = -ROWS_SPEED;
-        // Automatically kill the pipe when it's no longer visible
         pipe.checkWorldBounds = true;
         pipe.outOfBoundsKill = true;
     },
@@ -127,16 +138,23 @@ var mainState = {
             game.stage.backgroundColor = '#74bf2e';
             this.bird.body.gravity.y = 300;
             this.hitPipe();
+            setTimeout(()=>this.restartGame(), 2000);
         }
     },
 
     hitPipe: function () {
-        // If the bird has already hit a pipe, do nothing
-        // It means the bird is already falling off the screen
+        setTimeout(()=>this.restartGame(), 2000);
+
         if (!this.bird.alive) return false;
         this.bird.alive = false;
         game.time.events.remove(this.timer);
         this.pipes.forEach(p => p.body.velocity.x = 0, this);
+        // this.bird.body.gravity.y = 300;
+        // this.hitPipe();
+        // this.this.loserLabel.text = `GAME OVER!! YOU SCORE ${this.score}`;
+        // this.labelScore.text = '';
+        if (this.score > 0)game.stage.backgroundColor = '#cc5353';
+
     }
 };
 
@@ -146,7 +164,14 @@ setTimeout(()=> {
     game.state.start('main');
 }, 2000);
 
-$('#volume-gain').val(VALUE_GAIN);
-$('#volume-gain').change(function (el) {
+volume_gain_el.change(function () {
     VALUE_GAIN = $(this).val();
+});
+
+gravity_gain_el.change(function () {
+    GRAVITY_VALUE = $(this).val();
+});
+
+begin_score_el.change(function () {
+    BEGIN_SCORE = $(this).val();
 });
