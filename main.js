@@ -44,7 +44,6 @@ volume_gain_el.val(VALUE_GAIN);
 gravity_gain_el.val(GRAVITY_VALUE);
 begin_score_el.val(BEGIN_SCORE);
 
-
 var mainState = {
     preload: function () {
         game.load.image('pipe', 'assets/pipe2.png');
@@ -82,8 +81,8 @@ var mainState = {
             }
             var average = values / length;
 
-            if (average > 45 && frequency_counter++ > FREQUENCY_LIMIT) {
-                this.jump({value: Math.round(average / 70)});
+            if (average > 15 && frequency_counter++ > FREQUENCY_LIMIT) {
+                this.jump({value: Math.round(average / 7)});
                 console.log(Math.round(average));
                 frequency_counter = 0;
             }
